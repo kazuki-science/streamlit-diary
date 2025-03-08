@@ -36,9 +36,18 @@ except Exception as e:
     data = []
 
 # **🔹 データの整形**
+expected_columns = ["日付", "満足度", "天気", "外出時間", "入眠時間", "起床時間",
+                    "睡眠_深い", "睡眠_浅い", "睡眠_レム", "睡眠_覚醒数",
+                    "ストレスレベル", "食事満足度", "カロリー", "朝ごはん", "昼ごはん", "夜ごはん"]
+
 if data:
     # ✅ 1行目をヘッダーとして DataFrame を作成
-    df = pd.DataFrame(data[1:], columns=data[0]) if len(data) > 1 else pd.DataFrame(columns=data[0])
+    df = pd.DataFrame(data[1:], columns=[col.strip() for col in data[0]]) if len(data) > 1 else pd.DataFrame(columns=data[0])
+
+    # 🔹 期待するカラムがない場合は追加
+    for col in expected_columns:
+        if col not in df.columns:
+            df[col] = None  # 🔹 欠損値を埋めるために `None` をセット
 
     # 🔹 数値データの変換（エラーを避けるため `errors='coerce'` を使用）
     numeric_cols = ["満足度", "外出時間", "睡眠_深い", "睡眠_浅い", "睡眠_レム", "睡眠_覚醒数",
@@ -54,10 +63,8 @@ if data:
             df[col] = df[col].fillna(0).astype(int)  # 欠損値を 0 にして整数型に変換
 
 else:
-    # 🔹 空の DataFrame を作成
-    df = pd.DataFrame(columns=["日付", "満足度", "天気", "外出時間", "入眠時間", "起床時間",
-                               "睡眠_深い", "睡眠_浅い", "睡眠_レム", "睡眠_覚醒数",
-                               "ストレスレベル", "食事満足度", "カロリー", "朝ごはん", "昼ごはん", "夜ごはん"])
+    # 🔹 空の DataFrame を作成（期待するカラムを設定）
+    df = pd.DataFrame(columns=expected_columns)
 
 # **🔹 過去のデータを表示**
 st.write("📜 過去の日記")
@@ -70,5 +77,6 @@ else:
 if not df.empty:
     csv = df.to_csv(index=False).encode("utf-8")
     st.download_button("📥 CSV をダウンロード", data=csv, file_name="diary.csv", mime="text/csv")
+
 
 
