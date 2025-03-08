@@ -31,75 +31,7 @@ except Exception as e:
 # **🔹 Streamlit UI**
 st.title("📖 日記入力フォーム")
 
-# **🔹 入力フォーム**
-date = st.date_input("📅 日付を選択")
-satisfaction = st.slider("😊 1日の満足度 (1〜5)", 1, 5, 3)
-weather = st.selectbox("🌦 天気", [
-    "晴れ", "曇り", "雨", "雪", "雷雨", "霧", "強風",
-    "晴れのち曇り", "晴れのち雨", "晴れのち雪",
-    "曇りのち晴れ", "曇りのち雨", "曇りのち雪",
-    "雨のち晴れ", "雨のち曇り", "雨のち雪",
-    "雪のち晴れ", "雪のち曇り", "雪のち雨"
-])
-
-# **🔹 時間・活動データ**
-outdoor_time = st.number_input("🚶 外出時間 (分)", min_value=0, step=5)
-sleep_time = st.time_input("😴 入眠時間")
-wake_time = st.time_input("⏰ 起床時間")
-
-deep_sleep = st.number_input("💤 睡眠_深い (分)", min_value=0, step=5)
-light_sleep = st.number_input("💤 睡眠_浅い (分)", min_value=0, step=5)
-rem_sleep = st.number_input("💭 睡眠_レム (分)", min_value=0, step=5)
-wake_count = st.number_input("🌙 睡眠_覚醒数 (回)", min_value=0, step=1)
-
-# **🔹 健康 & 生活習慣**
-stress = st.slider("⚡ ストレスレベル (1〜5)", 1, 5, 3)
-meal_satisfaction = st.slider("🍽 食事満足度 (1〜5)", 1, 5, 3)
-calories = st.number_input("🔥 カロリー", min_value=0, step=50)
-breakfast_flag = st.checkbox("🍳 朝ごはんフラグ")
-lunch_flag = st.checkbox("🥗 昼ごはんフラグ")
-dinner_flag = st.checkbox("🍛 夜ごはんフラグ")
-
-# **🔹 追加の項目**
-holiday_flag = st.checkbox("🏖 和紗の休日フラグ")
-exercise_time = st.number_input("🏃 運動時間 (分)", min_value=0, step=5)
-steps = st.number_input("🚶‍♂️ 歩数", min_value=0, step=100)
-muscle_training_flag = st.checkbox("💪 筋トレフラグ")
-
-work_time = st.number_input("💼 仕事時間 (時間)", min_value=0.0, step=0.5)
-study_time = st.number_input("📖 勉強時間 (時間)", min_value=0.0, step=0.5)
-hobby_time = st.number_input("🎨 趣味時間 (時間)", min_value=0.0, step=0.5)
-social_time = st.number_input("👥 人と接した時間 (時間)", min_value=0.0, step=0.5)
-
-sns_time = st.number_input("📱 SNS利用時間 (分)", min_value=0, step=5)
-youtube_time = st.number_input("📺 YouTube利用時間 (分)", min_value=0, step=5)
-family_time = st.number_input("👨‍👩‍👧 家族といた時間 (分)", min_value=0, step=5)
-friend_time = st.number_input("👫 友達といた時間 (分)", min_value=0, step=5)
-
-positive_event = st.text_area("✨ ポジティブ出来事")
-negative_event = st.text_area("😞 ネガティブ出来事")
-daily_comment = st.text_area("📝 1日のコメント")
-
-# **🔹 保存ボタン**
-if st.button("📌 保存"):
-    new_data = [
-        str(date), satisfaction, weather, outdoor_time, 
-        sleep_time.strftime("%H:%M"), wake_time.strftime("%H:%M"),  
-        deep_sleep, light_sleep, rem_sleep, wake_count, stress, meal_satisfaction,
-        calories, int(breakfast_flag), int(lunch_flag), int(dinner_flag),
-        int(holiday_flag), exercise_time, steps, int(muscle_training_flag),
-        work_time, study_time, hobby_time, social_time,
-        sns_time, youtube_time, family_time, friend_time,
-        positive_event, negative_event, daily_comment
-    ]
-    
-    try:
-        worksheet.append_row(new_data)  
-        st.success("✅ 日記を Google Sheets に保存しました！")
-    except Exception as e:
-        st.error(f"❌ データの保存に失敗しました: {e}")
-
-# **🔹 Google Sheets からデータを読み込む**
+# **🔹 Google Sheets からデータを取得**
 try:
     data = worksheet.get_all_values()
 except Exception as e:
@@ -117,14 +49,32 @@ columns = ["日付", "満足度", "天気", "外出時間", "入眠時間", "起
 
 df = pd.DataFrame(data[1:], columns=columns) if data else pd.DataFrame(columns=columns)
 
-# **🔹 表示**
+# **🔹 指定した日付の行を削除する機能**
+st.subheader("🗑 指定した日付のデータを削除")
+delete_date = st.date_input("📅 削除したい日付を選択")
+
+if st.button("🚮 指定日付のデータを削除"):
+    if not df.empty:
+        original_length = len(df)
+        df = df[df["日付"] != str(delete_date)]  # 指定した日付を削除
+        if len(df) < original_length:
+            try:
+                worksheet.clear()  # シートをクリア
+                worksheet.append_row(columns)  # ヘッダーを再追加
+                for row in df.values.tolist():
+                    worksheet.append_row(row)  # 更新後のデータを追加
+                st.success(f"✅ {delete_date} のデータを削除しました！")
+            except Exception as e:
+                st.error(f"❌ データの削除に失敗しました: {e}")
+        else:
+            st.warning(f"⚠ 指定した日付 {delete_date} のデータが見つかりませんでした。")
+    else:
+        st.warning("📭 データがありません。")
+
+# **🔹 過去のデータを表示**
 st.write("📜 過去の日記")
 st.dataframe(df)
 
 # **🔹 CSV ダウンロード機能**
 csv = df.to_csv(index=False).encode("utf-8")
 st.download_button("📥 CSV をダウンロード", data=csv, file_name="diary.csv", mime="text/csv")
-
-
-
-
