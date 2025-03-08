@@ -36,20 +36,22 @@ date = st.date_input("📅 日付を選択")
 satisfaction = st.slider("😊 1日の満足度 (1〜5)", 1, 5, 3)
 
 # **🔹 天気の選択**
-weather_options = weather_options = [
+weather_options = [
     "晴れ", "曇り", "雨", "雪", "雷雨", "霧", "強風",
     "晴れのち曇り", "晴れのち雨", "晴れのち雪",
     "曇りのち晴れ", "曇りのち雨", "曇りのち雪",
     "雨のち晴れ", "雨のち曇り", "雨のち雪",
     "雪のち晴れ", "雪のち曇り", "雪のち雨"
 ]
-
 weather = st.selectbox("🌦 天気", weather_options)
 
 # **🔹 時間・活動データ**
 outdoor_time = st.number_input("🚶 外出時間 (分)", min_value=0, step=5)
+
+# **🔹 修正：`time_input()` を使って時:分で入力**
 sleep_time = st.time_input("😴 入眠時間")
 wake_time = st.time_input("⏰ 起床時間")
+
 deep_sleep = st.number_input("💤 睡眠_深い (分)", min_value=0, step=5)
 light_sleep = st.number_input("💤 睡眠_浅い (分)", min_value=0, step=5)
 rem_sleep = st.number_input("💭 睡眠_レム (分)", min_value=0, step=5)
@@ -86,7 +88,8 @@ daily_comment = st.text_area("📝 1日のコメント")
 # **🔹 保存ボタン**
 if st.button("📌 保存"):
     new_data = [
-        str(date), satisfaction, weather, outdoor_time, sleep_time, wake_time,
+        str(date), satisfaction, weather, outdoor_time, 
+        sleep_time.strftime("%H:%M"), wake_time.strftime("%H:%M"),  # ✅ `strftime` で時間フォーマット
         deep_sleep, light_sleep, rem_sleep, wake_count, stress, meal_satisfaction,
         calories, int(breakfast_flag), int(lunch_flag), int(dinner_flag),
         exercise_time, steps, int(workout_flag), work_time, study_time, hobby_time,
@@ -111,22 +114,15 @@ except Exception as e:
 if data:
     df = pd.DataFrame(data[1:], columns=data[0]) if len(data) > 1 else pd.DataFrame(columns=data[0])
 else:
-    df = pd.DataFrame(columns=[
-        "日付", "満足度", "天気", "外出時間", "入眠時間", "起床時間",
-        "睡眠_深い", "睡眠_浅い", "睡眠_レム", "睡眠_覚醒数",
-        "ストレスレベル", "食事満足度", "カロリー",
-        "朝ごはん", "昼ごはん", "夜ごはん",
-        "運動時間", "歩数", "筋トレ", "仕事時間", "勉強時間", "趣味時間",
-        "人と接した時間", "SNS利用時間", "YouTube利用時間",
-        "家族といた時間", "友達といた時間",
-        "ポジティブな出来事", "ネガティブな出来事", "1日のコメント"
-    ])
+    df = pd.DataFrame(columns=["日付", "満足度", "天気", "外出時間", "入眠時間", "起床時間",
+                               "睡眠_深い", "睡眠_浅い", "睡眠_レム", "睡眠_覚醒数",
+                               "ストレスレベル", "食事満足度", "カロリー", "朝ごはん", "昼ごはん", "夜ごはん",
+                               "運動時間", "歩数", "筋トレ", "仕事時間", "勉強時間", "趣味時間",
+                               "人と接した時間", "SNS利用時間", "YouTube利用時間", "家族といた時間", "友達といた時間",
+                               "ポジティブな出来事", "ネガティブな出来事", "1日のコメント"])
 
 # **🔹 過去のデータを表示**
 st.write("📜 過去の日記")
 st.dataframe(df)
 
-# **🔹 CSV ダウンロード機能**
-csv = df.to_csv(index=False).encode("utf-8")
-st.download_button("📥 CSV をダウンロード", data=csv, file_name="diary.csv", mime="text/csv")
 
