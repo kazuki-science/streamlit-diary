@@ -14,6 +14,10 @@ json_creds = os.getenv("GCP_SERVICE_ACCOUNT")
 # 🔹 JSON 文字列を辞書型に変換
 if json_creds:
     creds_dict = json.loads(json_creds)
+
+    # 🔹 `private_key` の改行を修正
+    creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
+
     creds = Credentials.from_service_account_info(creds_dict)
 else:
     st.error("認証情報が設定されていません！Streamlit Cloud の Secrets を確認してください。")
@@ -60,3 +64,4 @@ st.download_button(
     file_name="diary.csv",
     mime="text/csv",
 )
+
