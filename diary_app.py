@@ -4,7 +4,7 @@ import gspread
 from google.oauth2.service_account import Credentials
 
 # 🔹 Google Sheets の設定
-SHEET_ID = "あなたのスプレッドシートIDをここに入力"
+SHEET_ID = "1PH9nW0Eb46_OF_lEDkmhCYeq7Et2xoSpGKz5lpkjPB4"
 
 # 🔹 環境変数から Google Cloud の認証情報を取得
 try:
