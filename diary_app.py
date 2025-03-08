@@ -33,7 +33,7 @@ st.title("日記入力フォーム")
 
 # 入力フォーム
 date = st.date_input("日付を選択")
-satisfaction = st.slider("満足度 (1〜10)", 1, 10, 5)
+satisfaction = st.slider("1日の満足度 (1〜5)", 1, 5, 3)
 weight = st.number_input("体重 (kg)", min_value=30.0, max_value=150.0, step=0.1)
 note = st.text_area("自由記述")
 
