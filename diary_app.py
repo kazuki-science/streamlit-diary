@@ -2,25 +2,19 @@ import streamlit as st
 import pandas as pd
 import gspread
 import json
-import os
 from google.oauth2.service_account import Credentials
 
 # 🔹 Google Sheets の設定
 SHEET_ID = "あなたのスプレッドシートIDをここに入力"
 
 # 🔹 環境変数から Google Cloud の認証情報を取得
-json_creds = os.getenv("GCP_SERVICE_ACCOUNT")
-
-# 🔹 JSON 文字列を辞書型に変換
-if json_creds:
-    creds_dict = json.loads(json_creds)
-
-    # 🔹 `private_key` の改行を修正
-    creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
-
+try:
+    json_creds = st.secrets["GCP_SERVICE_ACCOUNT"]  # ✅ `st.secrets` で取得
+    creds_dict = json.loads(json_creds)  # JSON に変換
+    creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")  # 🔹 改行を修正
     creds = Credentials.from_service_account_info(creds_dict)
-else:
-    st.error("認証情報が設定されていません！Streamlit Cloud の Secrets を確認してください。")
+except Exception as e:
+    st.error(f"認証情報の取得に失敗しました: {e}")
     st.stop()
 
 # 🔹 Google Sheets API に接続
@@ -64,4 +58,3 @@ st.download_button(
     file_name="diary.csv",
     mime="text/csv",
 )
-
