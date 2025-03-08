@@ -1,18 +1,26 @@
 import streamlit as st
 import pandas as pd
 import gspread
+import json
+import os
 from google.oauth2.service_account import Credentials
 
 # 🔹 Google Sheets の設定
-SHEET_ID = "1PH9nW0Eb46_OF_lEDkmhCYeq7Et2xoSpGKz5lpkjPB4"
-JSON_FILE = "/Users/kazukiichikawa/Desktop/diary/orbital-wording-453107-c5-123733762aee.json"
+SHEET_ID = "あなたのスプレッドシートIDをここに入力"
 
-# Google Sheets API の認証
-scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = Credentials.from_service_account_file(JSON_FILE, scopes=scope)
+# 🔹 環境変数から Google Cloud の認証情報を取得
+json_creds = os.getenv("GCP_SERVICE_ACCOUNT")
+
+# 🔹 JSON 文字列を辞書型に変換
+if json_creds:
+    creds_dict = json.loads(json_creds)
+    creds = Credentials.from_service_account_info(creds_dict)
+else:
+    st.error("認証情報が設定されていません！Streamlit Cloud の Secrets を確認してください。")
+    st.stop()
+
+# 🔹 Google Sheets API に接続
 client = gspread.authorize(creds)
-
-# スプレッドシートを開く
 spreadsheet = client.open_by_key(SHEET_ID)
 worksheet = spreadsheet.sheet1  # 最初のシートを選択
 
@@ -21,7 +29,7 @@ st.title("日記入力フォーム")
 
 # 入力フォーム
 date = st.date_input("日付を選択")
-satisfaction = st.slider("1日の満足度 (1〜5)", 1, 5, 3)
+satisfaction = st.slider("満足度 (1〜10)", 1, 10, 5)
 weight = st.number_input("体重 (kg)", min_value=30.0, max_value=150.0, step=0.1)
 note = st.text_area("自由記述")
 
@@ -33,6 +41,7 @@ if st.button("保存"):
 
 # Google Sheets からデータを読み込む
 data = worksheet.get_all_values()
+
 # 🔹 **データが空の場合の処理**
 if not data:  # `data` が空なら
     df = pd.DataFrame(columns=["日付", "満足度", "体重", "自由記述"])  # 空のDataFrameを作成
