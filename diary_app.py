@@ -71,3 +71,4 @@ if not df.empty:
     csv = df.to_csv(index=False).encode("utf-8")
     st.download_button("📥 CSV をダウンロード", data=csv, file_name="diary.csv", mime="text/csv")
 
+
