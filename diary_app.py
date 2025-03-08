@@ -28,55 +28,49 @@ except Exception as e:
     st.error(f"❌ Google Sheets への接続に失敗しました: {e}")
     st.stop()
 
-# **🔹 Google Sheets からデータを取得**
+# Streamlit UI
+st.title("日記入力フォーム")
+
+# 入力フォーム
+date = st.date_input("日付を選択")
+satisfaction = st.slider("1日の満足度 (1〜5)", 1, 5, 3)
+weight = st.number_input("体重 (kg)", min_value=30.0, max_value=150.0, step=0.1)
+note = st.text_area("自由記述")
+
+# 保存ボタン
+if st.button("保存"):
+    new_data = [str(date), satisfaction, weight, note]
+    try:
+        worksheet.append_row(new_data)  # 🔹 Google Sheets にデータを追加
+        st.success("✅ 日記を Google Sheets に保存しました！")
+    except Exception as e:
+        st.error(f"❌ データの保存に失敗しました: {e}")
+
+# Google Sheets からデータを読み込む
 try:
     data = worksheet.get_all_values()
 except Exception as e:
     st.error(f"❌ スプレッドシートのデータ取得に失敗しました: {e}")
     data = []
 
-# **🔹 データの整形**
-expected_columns = ["日付", "満足度", "天気", "外出時間", "入眠時間", "起床時間",
-                    "睡眠_深い", "睡眠_浅い", "睡眠_レム", "睡眠_覚醒数",
-                    "ストレスレベル", "食事満足度", "カロリー", "朝ごはん", "昼ごはん", "夜ごはん"]
-
+# 🔹 **データが空の場合の処理**
 if data:
-    # ✅ 1行目をヘッダーとして DataFrame を作成
-    df = pd.DataFrame(data[1:], columns=[col.strip() for col in data[0]]) if len(data) > 1 else pd.DataFrame(columns=data[0])
-
-    # 🔹 期待するカラムがない場合は追加
-    for col in expected_columns:
-        if col not in df.columns:
-            df[col] = None  # 🔹 欠損値を埋めるために `None` をセット
-
-    # 🔹 数値データの変換（エラーを避けるため `errors='coerce'` を使用）
-    numeric_cols = ["満足度", "外出時間", "睡眠_深い", "睡眠_浅い", "睡眠_レム", "睡眠_覚醒数",
-                    "ストレスレベル", "食事満足度", "カロリー", "朝ごはん", "昼ごはん", "夜ごはん"]
-    for col in numeric_cols:
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce")  # 文字列が混ざっていても `NaN` に変換
-
-    # 🔹 Boolean フラグを整数に変換
-    bool_cols = ["朝ごはん", "昼ごはん", "夜ごはん"]
-    for col in bool_cols:
-        if col in df.columns:
-            df[col] = df[col].fillna(0).astype(int)  # 欠損値を 0 にして整数型に変換
-
+    df = pd.DataFrame(data[1:], columns=data[0]) if len(data) > 1 else pd.DataFrame(columns=data[0])
 else:
-    # 🔹 空の DataFrame を作成（期待するカラムを設定）
-    df = pd.DataFrame(columns=expected_columns)
+    df = pd.DataFrame(columns=["日付", "満足度", "体重", "自由記述"])
 
-# **🔹 過去のデータを表示**
+# 過去のデータを表示
 st.write("📜 過去の日記")
-if not df.empty:
-    st.dataframe(df)
-else:
-    st.write("📭 過去のデータがありません")
+st.dataframe(df)
 
-# **🔹 CSV ダウンロード機能**
-if not df.empty:
-    csv = df.to_csv(index=False).encode("utf-8")
-    st.download_button("📥 CSV をダウンロード", data=csv, file_name="diary.csv", mime="text/csv")
+# CSV ダウンロード機能
+csv = df.to_csv(index=False).encode("utf-8")
+st.download_button(
+    label="📥 CSV をダウンロード",
+    data=csv,
+    file_name="diary.csv",
+    mime="text/csv",
+)
 
 
 
