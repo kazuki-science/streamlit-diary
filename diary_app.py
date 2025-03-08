@@ -8,7 +8,7 @@ SHEET_ID = "あなたのスプレッドシートIDをここに入力"
 
 # 🔹 環境変数から Google Cloud の認証情報を取得
 try:
-    creds_dict = st.secrets["GCP_SERVICE_ACCOUNT"]  # ✅ そのまま辞書として取得
+    creds_dict = dict(st.secrets["GCP_SERVICE_ACCOUNT"])  # ✅ dict() でコピー
     creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")  # 🔹 改行を修正
     creds = Credentials.from_service_account_info(creds_dict)
 except Exception as e:
@@ -67,4 +67,5 @@ st.download_button(
     file_name="diary.csv",
     mime="text/csv",
 )
+
 
