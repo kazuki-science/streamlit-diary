@@ -52,11 +52,26 @@ outdoor_time = st.number_input("🚶 外出時間 (分)", min_value=0, step=5)
 sleep_time = st.time_input("😴 入眠時間")
 wake_time = st.time_input("⏰ 起床時間")
 
+deep_sleep = st.number_input("💤 睡眠_深い (分)", min_value=0, step=5)
+light_sleep = st.number_input("💤 睡眠_浅い (分)", min_value=0, step=5)
+rem_sleep = st.number_input("💭 睡眠_レム (分)", min_value=0, step=5)
+wake_count = st.number_input("🌙 睡眠_覚醒数 (回)", min_value=0, step=1)
+
+# **🔹 健康 & 生活習慣**
+stress = st.slider("⚡ ストレスレベル (1〜5)", 1, 5, 3)
+meal_satisfaction = st.slider("🍽 食事満足度 (1〜5)", 1, 5, 3)
+calories = st.number_input("🔥 カロリー", min_value=0, step=50)
+breakfast_flag = st.checkbox("🍳 朝ごはんフラグ")
+lunch_flag = st.checkbox("🥗 昼ごはんフラグ")
+dinner_flag = st.checkbox("🍛 夜ごはんフラグ")
+
 # **🔹 保存ボタン**
 if st.button("📌 保存"):
     new_data = [
-        str(date), satisfaction, weather, str(outdoor_time), 
-        sleep_time.strftime("%H:%M"), wake_time.strftime("%H:%M")  # ✅ `strftime` で時間フォーマット
+        str(date), satisfaction, weather, outdoor_time, 
+        sleep_time.strftime("%H:%M"), wake_time.strftime("%H:%M"),  # ✅ `strftime` で時間フォーマット
+        deep_sleep, light_sleep, rem_sleep, wake_count, stress, meal_satisfaction,
+        calories, int(breakfast_flag), int(lunch_flag), int(dinner_flag)
     ]
     
     try:
@@ -74,16 +89,12 @@ except Exception as e:
 
 # **🔹 データが空の場合の処理**
 if data:
+    # ✅ 1行目をヘッダーとして DataFrame を作成
     df = pd.DataFrame(data[1:], columns=data[0]) if len(data) > 1 else pd.DataFrame(columns=data[0])
-
-    # ✅ 数値データの変換
-    num_cols = ["外出時間"]
-    for col in num_cols:
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce")  # 数値変換（エラーならNaN）
-
 else:
-    df = pd.DataFrame(columns=["日付", "満足度", "天気", "外出時間", "入眠時間", "起床時間"])
+    df = pd.DataFrame(columns=["日付", "満足度", "天気", "外出時間", "入眠時間", "起床時間",
+                               "睡眠_深い", "睡眠_浅い", "睡眠_レム", "睡眠_覚醒数",
+                               "ストレスレベル", "食事満足度", "カロリー", "朝ごはん", "昼ごはん", "夜ごはん"])
 
 # **🔹 過去のデータを表示（エラー回避のため `df.empty` をチェック）**
 st.write("📜 過去の日記")
@@ -96,4 +107,3 @@ else:
 if not df.empty:
     csv = df.to_csv(index=False).encode("utf-8")
     st.download_button("📥 CSV をダウンロード", data=csv, file_name="diary.csv", mime="text/csv")
-
