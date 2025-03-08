@@ -112,6 +112,28 @@ if st.button("📌 日記を保存"):
     except Exception as e:
         st.error(f"❌ データの保存に失敗しました: {e}")
 
+# **🔹 日記の削除機能**
+st.subheader("🗑 指定した日付のデータを削除")
+delete_date = st.date_input("📅 削除したい日付を選択")
+
+if st.button("🚮 指定日付のデータを削除"):
+    if not df.empty:
+        original_length = len(df)
+        df = df[df["日付"] != str(delete_date)]  # 指定した日付を削除
+        if len(df) < original_length:
+            try:
+                worksheet.clear()  # シートをクリア
+                worksheet.append_row(columns)  # ヘッダーを再追加
+                for row in df.values.tolist():
+                    worksheet.append_row(row)  # 更新後のデータを追加
+                st.success(f"✅ {delete_date} のデータを削除しました！")
+            except Exception as e:
+                st.error(f"❌ データの削除に失敗しました: {e}")
+        else:
+            st.warning(f"⚠ 指定した日付 {delete_date} のデータが見つかりませんでした。")
+    else:
+        st.warning("📭 データがありません。")
+        
 # **🔹 過去の日記を表示**
 st.write("📜 過去の日記")
 st.dataframe(df)
