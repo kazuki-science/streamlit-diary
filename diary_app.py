@@ -10,7 +10,11 @@ SHEET_ID = "あなたのスプレッドシートIDをここに入力"
 try:
     creds_dict = dict(st.secrets["GCP_SERVICE_ACCOUNT"])  # ✅ dict() でコピー
     creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")  # 🔹 改行を修正
-    creds = Credentials.from_service_account_info(creds_dict)
+
+    # ✅ スコープを明示的に指定
+    scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
+    creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
+
 except Exception as e:
     st.error(f"❌ 認証情報の取得に失敗しました: {e}")
     st.stop()
@@ -67,5 +71,3 @@ st.download_button(
     file_name="diary.csv",
     mime="text/csv",
 )
-
-
