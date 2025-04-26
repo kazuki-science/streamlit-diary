@@ -65,29 +65,28 @@ df = pd.DataFrame(data[1:], columns=columns) if data else pd.DataFrame(columns=c
 
 # **🔹 Streamlit UI**
 # 🔹 日記入力フォーム
-# 🔹 日記入力フォーム
-st.title("📖 日記入力フォーム")
+st.title("日記入力フォーム")
 
 # 日付
-date = st.date_input("📅 日付")
+date = st.date_input("日付")
 
 # 朝・昼・夜の満足度・ストレス
-morning_satisfaction = st.slider("🌅 朝満足度", 0, 10, 5)
-morning_stress = st.slider("🌅 朝ストレス", 0, 10, 5)
-noon_satisfaction = st.slider("🌞 昼満足度", 0, 10, 5)
-noon_stress = st.slider("🌞 昼ストレス", 0, 10, 5)
-night_satisfaction = st.slider("🌙 夜満足度", 0, 10, 5)
-night_stress = st.slider("🌙 夜ストレス", 0, 10, 5)
+morning_satisfaction = st.slider("朝満足度", 0, 10, 5)
+morning_stress = st.slider("朝ストレス", 0, 10, 5)
+noon_satisfaction = st.slider("昼満足度", 0, 10, 5)
+noon_stress = st.slider("昼ストレス", 0, 10, 5)
+night_satisfaction = st.slider("夜満足度", 0, 10, 5)
+night_stress = st.slider("夜ストレス", 0, 10, 5)
 
 # 情緒
-emotion = st.selectbox("😊 情緒", ["快適", "普通", "不快"])
+emotion = st.selectbox("情緒", ["快適", "普通", "不快"])
 
 # 総合ストレス
-stress = st.number_input("⚡ ストレス（整数）", min_value=0, step=1)
+stress = st.number_input("ストレス（整数）", min_value=0, step=1)
 
 # 休日・天気
-holiday_flag = st.checkbox("🏖 休日フラグ")
-weather = st.selectbox("🌦 天気", [
+holiday_flag = st.checkbox("休日フラグ")
+weather = st.selectbox("天気", [
     "晴れ", "曇り", "雨", 
     "晴れのち曇り", "晴れのち雨", 
     "曇りのち晴れ", "曇りのち雨", 
@@ -95,60 +94,60 @@ weather = st.selectbox("🌦 天気", [
 ])
 
 # 外出
-outdoor_time = st.number_input("🚶 外出時間（分）", min_value=0, step=5)
+outdoor_time = st.number_input("外出時間（分）", min_value=0, step=5)
 
 # 睡眠
-sleep_time = st.time_input("🛌 入眠時間")
-wake_time = st.time_input("⏰ 起床時間")
-deep_sleep = st.number_input("💤 深い眠り（分）", min_value=0, step=5)
-light_sleep = st.number_input("💤 浅い眠り（分）", min_value=0, step=5)
-rem_sleep = st.number_input("💭 レム睡眠（分）", min_value=0, step=5)
-wake_count = st.number_input("🌙 覚醒回数", min_value=0, step=1)
+sleep_time = st.time_input("入眠時間")
+wake_time = st.time_input("起床時間")
+deep_sleep = st.number_input("深い眠り（分）", min_value=0, step=5)
+light_sleep = st.number_input("浅い眠り（分）", min_value=0, step=5)
+rem_sleep = st.number_input("レム睡眠（分）", min_value=0, step=5)
+wake_count = st.number_input("覚醒回数", min_value=0, step=1)
 
 # 食事
-meal_satisfaction = st.slider("🍽 食事満足度", 1, 5, 3)
-calories = st.number_input("🔥 摂取カロリー（kcal）", min_value=0, step=50)
-breakfast_flag = st.checkbox("🍳 朝ごはんフラグ")
-lunch_flag = st.checkbox("🥗 昼ごはんフラグ")
-dinner_flag = st.checkbox("🍛 夜ごはんフラグ")
-am_caffeine_flag = st.checkbox("☕ 午前カフェインフラグ")
-pm_caffeine_flag = st.checkbox("☕ 午後カフェインフラグ")
-alcohol_flag = st.checkbox("🍶 飲酒フラグ")
+meal_satisfaction = st.slider("食事満足度", 1, 5, 3)
+calories = st.number_input("摂取カロリー（kcal）", min_value=0, step=50)
+breakfast_flag = st.checkbox("朝ごはんフラグ")
+lunch_flag = st.checkbox("昼ごはんフラグ")
+dinner_flag = st.checkbox("夜ごはんフラグ")
+am_caffeine_flag = st.checkbox("午前カフェインフラグ")
+pm_caffeine_flag = st.checkbox("午後カフェインフラグ")
+alcohol_flag = st.checkbox("飲酒フラグ")
 
 # その他生活フラグ
-kazusa_holiday_flag = st.checkbox("🏖 和紗休日フラグ")
-work_flag = st.checkbox("🏢 出勤フラグ")
+kazusa_holiday_flag = st.checkbox("和紗休日フラグ")
+work_flag = st.checkbox("出勤フラグ")
 
 # 運動
-aerobic_time = st.number_input("🏃 有酸素運動時間（分）", min_value=0, step=5)
-anaerobic_time = st.number_input("🏋️‍♂️ 無酸素運動時間（分）", min_value=0, step=5)
-steps = st.number_input("🚶‍♂️ 歩数", min_value=0, step=100)
+aerobic_time = st.number_input("有酸素運動時間（分）", min_value=0, step=5)
+anaerobic_time = st.number_input("無酸素運動時間（分）", min_value=0, step=5)
+steps = st.number_input("歩数", min_value=0, step=100)
 
 # 仕事
-work_busy = st.slider("💼 仕事の忙しさ", 1, 5, 3)
-work_satisfaction = st.slider("💼 仕事満足感", 1, 5, 3)
+work_busy = st.slider("仕事の忙しさ", 1, 5, 3)
+work_satisfaction = st.slider("仕事満足感", 1, 5, 3)
 
 # スクリーン・趣味
-screen_time = st.number_input("📱 スクリーンタイム（分）", min_value=0, step=5)
-entertainment_time = st.number_input("🎮 エンタメタイム（分）", min_value=0, step=5)
-creativity_time = st.number_input("🎨 クリエイティビティタイム（分）", min_value=0, step=5)
-sns_time = st.number_input("📲 SNSタイム（分）", min_value=0, step=5)
+screen_time = st.number_input("スクリーンタイム（分）", min_value=0, step=5)
+entertainment_time = st.number_input("エンタメタイム（分）", min_value=0, step=5)
+creativity_time = st.number_input("クリエイティビティタイム（分）", min_value=0, step=5)
+sns_time = st.number_input("SNSタイム（分）", min_value=0, step=5)
 
 # 対人
-family_time = st.number_input("👨‍👩‍👧 家族といた時間（分）", min_value=0, step=5)
-relative_time = st.number_input("👨‍👩‍👧‍👦 親戚といた時間（分）", min_value=0, step=5)
-friend_time = st.number_input("👫 友達といた時間（分）", min_value=0, step=5)
+family_time = st.number_input("家族といた時間（分）", min_value=0, step=5)
+relative_time = st.number_input("親戚といた時間（分）", min_value=0, step=5)
+friend_time = st.number_input("友達といた時間（分）", min_value=0, step=5)
 
 # イベント
-quarrel_flag = st.checkbox("💢 喧嘩フラグ")
+quarrel_flag = st.checkbox("喧嘩フラグ")
 
 # 朝昼夜の流れ
-morning_flow = st.text_area("🌅 朝の流れ")
-noon_flow = st.text_area("🌞 昼の流れ")
-night_flow = st.text_area("🌙 夜の流れ")
+morning_flow = st.text_area("朝の流れ")
+noon_flow = st.text_area("昼の流れ")
+night_flow = st.text_area("夜の流れ")
 
 # 🔹 保存ボタン
-if st.button("📌 日記を保存"):
+if st.button("日記を保存"):
     new_data = [
         str(date),
         morning_satisfaction, morning_stress,
