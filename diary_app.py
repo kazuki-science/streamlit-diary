@@ -36,81 +36,148 @@ except Exception as e:
     data = []
 
 # **🔹 DataFrame のカラムを定義**
-columns = ["日付", "満足度", "天気", "外出時間", "入眠時間", "起床時間",
-           "睡眠_深い", "睡眠_浅い", "睡眠_レム", "睡眠_覚醒数",
-           "ストレスレベル", "食事満足度", "カロリー", "朝ごはん", "昼ごはん", "夜ごはん",
-           "和紗の休日フラグ", "運動時間", "歩数", "筋トレフラグ",
-           "仕事時間", "勉強時間", "趣味時間", "人と接した時間",
-           "SNS利用時間", "YouTube利用時間", "家族といた時間", "友達といた時間",
-           "ポジティブ出来事", "ネガティブ出来事", "1日のコメント"]
+columns = [
+    "日付",
+    "朝満足度", "朝ストレス",
+    "昼満足度", "昼ストレス",
+    "夜満足度", "夜ストレス",
+    "情緒",
+    "ストレス",
+    "休日フラグ",
+    "天気",
+    "外出時間",
+    "入眠時間", "起床時間",
+    "深い眠り", "浅い眠り", "レム睡眠", "覚醒回数",
+    "食事満足度", "摂取カロリー",
+    "朝ごはんフラグ", "昼ごはんフラグ", "夜ごはんフラグ",
+    "午前カフェインフラグ", "午後カフェインフラグ",
+    "飲酒フラグ", "和紗休日フラグ", "出勤フラグ",
+    "有酸素運動時間", "無酸素運動時間", "歩数",
+    "仕事の忙しさ", "仕事満足感",
+    "スクリーンタイム", "エンターテイメントタイム", "クリエイティビティタイム", "SNSタイム",
+    "家族といた時間", "親戚といた時間", "友達といた時間",
+    "喧嘩フラグ",
+    "朝の流れ", "昼の流れ", "夜の流れ"
+]
+
 
 df = pd.DataFrame(data[1:], columns=columns) if data else pd.DataFrame(columns=columns)
 
 # **🔹 Streamlit UI**
+# 🔹 日記入力フォーム
 st.title("📖 日記入力フォーム")
 
-# **🔹 新規日記の入力**
-st.subheader("✏️ 新しい日記を追加")
-date = st.date_input("📅 日付を選択")
-satisfaction = st.slider("😊 1日の満足度 (1〜5)", 1, 5, 3)
-weather = st.selectbox("🌦 天気", ["晴れ", "曇り", "雨", "雪", "雷雨", "霧", "強風"])
+# 日付
+date = st.date_input("📅 日付")
 
-# **🔹 時間・活動データ**
-outdoor_time = st.number_input("🚶 外出時間 (分)", min_value=0, step=5)
-sleep_time = st.time_input("😴 入眠時間")
+# 朝・昼・夜の満足度・ストレス
+morning_satisfaction = st.slider("🌅 朝満足度", 0, 10, 5)
+morning_stress = st.slider("🌅 朝ストレス", 0, 10, 5)
+noon_satisfaction = st.slider("🌞 昼満足度", 0, 10, 5)
+noon_stress = st.slider("🌞 昼ストレス", 0, 10, 5)
+night_satisfaction = st.slider("🌙 夜満足度", 0, 10, 5)
+night_stress = st.slider("🌙 夜ストレス", 0, 10, 5)
+
+# 情緒
+emotion = st.selectbox("😊 情緒", ["快適", "普通", "不快"])
+
+# 総合ストレス
+stress = st.number_input("⚡ ストレス（整数）", min_value=0, step=1)
+
+# 休日・天気
+holiday_flag = st.checkbox("🏖 休日フラグ")
+weather = st.selectbox("🌦 天気", [
+    "晴れ", "曇り", "雨", 
+    "晴れのち曇り", "晴れのち雨", 
+    "曇りのち晴れ", "曇りのち雨", 
+    "雨のち晴れ", "雨のち曇り"
+])
+
+# 外出
+outdoor_time = st.number_input("🚶 外出時間（分）", min_value=0, step=5)
+
+# 睡眠
+sleep_time = st.time_input("🛌 入眠時間")
 wake_time = st.time_input("⏰ 起床時間")
+deep_sleep = st.number_input("💤 深い眠り（分）", min_value=0, step=5)
+light_sleep = st.number_input("💤 浅い眠り（分）", min_value=0, step=5)
+rem_sleep = st.number_input("💭 レム睡眠（分）", min_value=0, step=5)
+wake_count = st.number_input("🌙 覚醒回数", min_value=0, step=1)
 
-deep_sleep = st.number_input("💤 睡眠_深い (分)", min_value=0, step=5)
-light_sleep = st.number_input("💤 睡眠_浅い (分)", min_value=0, step=5)
-rem_sleep = st.number_input("💭 睡眠_レム (分)", min_value=0, step=5)
-wake_count = st.number_input("🌙 睡眠_覚醒数 (回)", min_value=0, step=1)
-
-# **🔹 健康 & 生活習慣**
-stress = st.slider("⚡ ストレスレベル (1〜5)", 1, 5, 3)
-meal_satisfaction = st.slider("🍽 食事満足度 (1〜5)", 1, 5, 3)
-calories = st.number_input("🔥 カロリー", min_value=0, step=50)
+# 食事
+meal_satisfaction = st.slider("🍽 食事満足度", 1, 5, 3)
+calories = st.number_input("🔥 摂取カロリー（kcal）", min_value=0, step=50)
 breakfast_flag = st.checkbox("🍳 朝ごはんフラグ")
 lunch_flag = st.checkbox("🥗 昼ごはんフラグ")
 dinner_flag = st.checkbox("🍛 夜ごはんフラグ")
+am_caffeine_flag = st.checkbox("☕ 午前カフェインフラグ")
+pm_caffeine_flag = st.checkbox("☕ 午後カフェインフラグ")
+alcohol_flag = st.checkbox("🍶 飲酒フラグ")
 
-# **🔹 追加の項目**
-holiday_flag = st.checkbox("🏖 和紗の休日フラグ")
-exercise_time = st.number_input("🏃 運動時間 (分)", min_value=0, step=5)
+# その他生活フラグ
+kazusa_holiday_flag = st.checkbox("🏖 和紗休日フラグ")
+work_flag = st.checkbox("🏢 出勤フラグ")
+
+# 運動
+aerobic_time = st.number_input("🏃 有酸素運動時間（分）", min_value=0, step=5)
+anaerobic_time = st.number_input("🏋️‍♂️ 無酸素運動時間（分）", min_value=0, step=5)
 steps = st.number_input("🚶‍♂️ 歩数", min_value=0, step=100)
-muscle_training_flag = st.checkbox("💪 筋トレフラグ")
 
-work_time = st.number_input("💼 仕事時間 (時間)", min_value=0.0, step=0.5)
-study_time = st.number_input("📖 勉強時間 (時間)", min_value=0.0, step=0.5)
-hobby_time = st.number_input("🎨 趣味時間 (時間)", min_value=0.0, step=0.5)
-social_time = st.number_input("👥 人と接した時間 (時間)", min_value=0.0, step=0.5)
+# 仕事
+work_busy = st.slider("💼 仕事の忙しさ", 1, 5, 3)
+work_satisfaction = st.slider("💼 仕事満足感", 1, 5, 3)
 
-sns_time = st.number_input("📱 SNS利用時間 (分)", min_value=0, step=5)
-youtube_time = st.number_input("📺 YouTube利用時間 (分)", min_value=0, step=5)
-family_time = st.number_input("👨‍👩‍👧 家族といた時間 (分)", min_value=0, step=5)
-friend_time = st.number_input("👫 友達といた時間 (分)", min_value=0, step=5)
+# スクリーン・趣味
+screen_time = st.number_input("📱 スクリーンタイム（分）", min_value=0, step=5)
+entertainment_time = st.number_input("🎮 エンタメタイム（分）", min_value=0, step=5)
+creativity_time = st.number_input("🎨 クリエイティビティタイム（分）", min_value=0, step=5)
+sns_time = st.number_input("📲 SNSタイム（分）", min_value=0, step=5)
 
-positive_event = st.text_area("✨ ポジティブ出来事")
-negative_event = st.text_area("😞 ネガティブ出来事")
-daily_comment = st.text_area("📝 1日のコメント")
+# 対人
+family_time = st.number_input("👨‍👩‍👧 家族といた時間（分）", min_value=0, step=5)
+relative_time = st.number_input("👨‍👩‍👧‍👦 親戚といた時間（分）", min_value=0, step=5)
+friend_time = st.number_input("👫 友達といた時間（分）", min_value=0, step=5)
 
-# **🔹 保存ボタン**
+# イベント
+quarrel_flag = st.checkbox("💢 喧嘩フラグ")
+
+# 朝昼夜の流れ
+morning_flow = st.text_area("🌅 朝の流れ")
+noon_flow = st.text_area("🌞 昼の流れ")
+night_flow = st.text_area("🌙 夜の流れ")
+
+# 🔹 保存ボタン
 if st.button("📌 日記を保存"):
     new_data = [
-        str(date), satisfaction, weather, outdoor_time, 
-        sleep_time.strftime("%H:%M"), wake_time.strftime("%H:%M"),  
-        deep_sleep, light_sleep, rem_sleep, wake_count, stress, meal_satisfaction,
-        calories, int(breakfast_flag), int(lunch_flag), int(dinner_flag),
-        int(holiday_flag), exercise_time, steps, int(muscle_training_flag),
-        work_time, study_time, hobby_time, social_time,
-        sns_time, youtube_time, family_time, friend_time,
-        positive_event, negative_event, daily_comment
+        str(date),
+        morning_satisfaction, morning_stress,
+        noon_satisfaction, noon_stress,
+        night_satisfaction, night_stress,
+        emotion,
+        stress,
+        int(holiday_flag),
+        weather,
+        outdoor_time,
+        sleep_time.strftime("%H:%M"), wake_time.strftime("%H:%M"),
+        deep_sleep, light_sleep, rem_sleep, wake_count,
+        meal_satisfaction, calories,
+        int(breakfast_flag), int(lunch_flag), int(dinner_flag),
+        int(am_caffeine_flag), int(pm_caffeine_flag),
+        int(alcohol_flag), int(kazusa_holiday_flag), int(work_flag),
+        aerobic_time, anaerobic_time, steps,
+        work_busy, work_satisfaction,
+        screen_time, entertainment_time, creativity_time, sns_time,
+        family_time, relative_time, friend_time,
+        int(quarrel_flag),
+        morning_flow, noon_flow, night_flow
     ]
     
     try:
-        worksheet.append_row(new_data)  
-        st.success("✅ 日記を Google Sheets に保存しました！")
+        worksheet.append_row(new_data)
+        st.success("✅ 新しいフォーマットで日記を保存しました！")
     except Exception as e:
-        st.error(f"❌ データの保存に失敗しました: {e}")
+        st.error(f"❌ 保存に失敗しました: {e}")
+
 
 # **🔹 日記の削除機能**
 st.subheader("🗑 指定した日付のデータを削除")
