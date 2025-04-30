@@ -72,11 +72,8 @@ date = st.date_input("日付")
 
 # 朝・昼・夜の満足度・ストレス
 morning_satisfaction = st.slider("朝満足度", 0, 10, 5)
-morning_stress = st.slider("朝ストレス", 0, 10, 5)
 noon_satisfaction = st.slider("昼満足度", 0, 10, 5)
-noon_stress = st.slider("昼ストレス", 0, 10, 5)
 night_satisfaction = st.slider("夜満足度", 0, 10, 5)
-night_stress = st.slider("夜ストレス", 0, 10, 5)
 
 # 情緒
 emotion = st.selectbox("情緒", ["快適", "普通", "不快"])
