@@ -153,9 +153,9 @@ night_flow = st.text_area("夜の流れ")
 if st.button("日記を保存"):
     new_data = [
         str(date),
-        morning_satisfaction, morning_stress,
-        noon_satisfaction, noon_stress,
-        night_satisfaction, night_stress,
+        morning_satisfaction, 
+        noon_satisfaction, 
+        night_satisfaction, 
         emotion,
         stress,
         int(holiday_flag),
