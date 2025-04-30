@@ -160,7 +160,7 @@ if st.button("日記を保存"):
         stress,
         int(holiday_flag),
         weather,
-        outdoor_time, weignt,
+        outdoor_time, weight,
         sleep_time.strftime("%H:%M"), wake_time.strftime("%H:%M"),
         deep_sleep, light_sleep, rem_sleep, wake_count,
         meal_satisfaction, calories,
