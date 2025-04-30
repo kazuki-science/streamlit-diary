@@ -97,7 +97,7 @@ weather = st.selectbox("天気", [
 outdoor_time = st.number_input("外出時間（分）", min_value=0, step=5)
 
 # 体重
-weight = st.number_input("体重（kg）", min_value=0, step=0.1)
+weight = st.number_input("体重（kg）", min_value=0.0, step=0.1)
 
 # 睡眠
 sleep_time = st.time_input("入眠時間")
